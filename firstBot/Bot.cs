@@ -62,6 +62,7 @@ namespace firstBot
             {
                 e.Client.DebugLogger.LogMessage(LogLevel.Info, e.Client.CurrentApplication.Name, "Client is ready.", DateTime.Now);
             };
+
         }
 
         /// <summary>

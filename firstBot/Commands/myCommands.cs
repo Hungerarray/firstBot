@@ -15,6 +15,7 @@ namespace firstBot.Commands
         [Description("returns the ping")]
         public async Task Ping(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             await ctx.RespondAsync(ctx.Client.Ping.ToString());
         }
 
@@ -23,6 +24,7 @@ namespace firstBot.Commands
         [Hidden]
         public async Task Hi(CommandContext ctx)
         {
+            await ctx.TriggerTypingAsync();
             await ctx.RespondAsync($":wave: Hello {ctx.User.Mention}!! (●'◡'●)");
         }
 
@@ -32,6 +34,7 @@ namespace firstBot.Commands
             [Description("minimum limit")]int min, 
             [Description("maximum limit")] int max)
         {
+            await ctx.TriggerTypingAsync();
             var rand = new Random();
             if (min > max)
                 await ctx.RespondAsync("incorrect limit");
