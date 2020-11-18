@@ -1,18 +1,19 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace firstBot
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             if (ConfigInitialization())
             {
                 string jsonData = File.ReadAllText("config.json");
                 var config = JsonSerializer.Deserialize<ConfigJson>(jsonData);
+             
                 if (config.Token == "")
                 {
                     Console.WriteLine("Error! empty token");
@@ -24,7 +25,7 @@ namespace firstBot
                 else
                 {
                     var bot = new Bot(config.Token, config.Prefix);
-                    bot.RunBot();
+                    await bot.RunBot();
                 }
 
             }
@@ -36,7 +37,8 @@ namespace firstBot
         {
             try
             {
-                File.Open("config.json", FileMode.Open);
+                var fs = File.Open("config.json", FileMode.Open);
+                fs.Close();
             }
             catch (FileNotFoundException _)
             {
