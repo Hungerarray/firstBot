@@ -9,7 +9,7 @@ using DSharpPlus.Interactivity;
 
 namespace firstBot.Commands
 {
-    class myCommands
+    partial class myCommands
     {
         [Command("ping")]
         [Description("returns the ping")]

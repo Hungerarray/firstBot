@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
-
+using firstBot.Commands;
 
 namespace firstBot
 {
@@ -86,7 +86,8 @@ namespace firstBot
         /// </summary>
         static private void RegisterCommands()
         {
-            commands.RegisterCommands<Commands.myCommands>();
+            commands.RegisterCommands<myCommands>();
+            commands.RegisterCommands<privateCommands>();
         }
     }
 
