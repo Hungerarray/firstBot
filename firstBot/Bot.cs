@@ -12,11 +12,11 @@ namespace firstBot
     class Bot
     {
         static private DiscordClient dsClient;
-        static private DebugLogger logger;
+
         public Bot(string token, string prefix)
         {
             dsClient = CreateClient(token, prefix);
-
+            HookEvents();
         }
         public async Task RunBot()
         {
@@ -44,13 +44,16 @@ namespace firstBot
             return new DiscordClient(config);
         }
 
-        //static private void HookEvents()
-        //{
-        //    dsClient.Ready += async (e) => {
-        //         e.Client.DebugLogger.LogMessage(LogLevel.Info, "", "Client is ready.", DateTime.Now);
-               
-        //    });
-        //}
+        /// <summary>
+        /// Hook required events
+        /// </summary>
+        static private void HookEvents()
+        {
+            dsClient.Ready += async (e) =>
+            {
+                e.Client.DebugLogger.LogMessage(LogLevel.Info, e.Client.CurrentApplication.Name, "Client is ready.", DateTime.Now);    
+            };
+        }
     }
 
     
