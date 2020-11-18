@@ -13,15 +13,29 @@ namespace firstBot
     {
         static private DiscordClient dsClient;
         static private CommandsNextModule commands;
-
+        
         public Bot(string token, string prefix)
         {
             dsClient = CreateClient(token);
             HookEvents();
+
+            // setup bot for commands
             InitateCommands(prefix);
             RegisterCommands();
+
+            // setup bot to listen
+            InitiateInteractivity();
+
         }
 
+        /// <summary>
+        /// Register the commands to use
+        /// </summary>
+        static private void RegisterCommands()
+        {
+            commands.RegisterCommands<myCommands>();
+            commands.RegisterCommands<privateCommands>();
+        }
 
         /// <summary>
         /// Runs the bot asynchronously
@@ -82,12 +96,14 @@ namespace firstBot
         }
 
         /// <summary>
-        /// Register the commands to use
+        /// establishes Interactivity
         /// </summary>
-        static private void RegisterCommands()
+        static private void InitiateInteractivity()
         {
-            commands.RegisterCommands<myCommands>();
-            commands.RegisterCommands<privateCommands>();
+            var config = new InteractivityConfiguration()
+            {Timeout = TimeSpan.FromMinutes(2)};
+
+            dsClient.UseInteractivity(config);
         }
     }
 

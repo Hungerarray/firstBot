@@ -6,6 +6,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Interactivity;
+using DSharpPlus.Entities;
 
 namespace firstBot.Commands
 {
@@ -30,8 +31,8 @@ namespace firstBot.Commands
 
         [Command("random")]
         [Description("Return a random number between min and max")]
-        public async Task Random(CommandContext ctx, 
-            [Description("minimum limit")]int min, 
+        public async Task Random(CommandContext ctx,
+            [Description("minimum limit")] int min,
             [Description("maximum limit")] int max)
         {
             await ctx.TriggerTypingAsync();
@@ -40,6 +41,22 @@ namespace firstBot.Commands
                 await ctx.RespondAsync("incorrect limit");
             else
                 await ctx.RespondAsync(rand.Next(min, max).ToString());
+        }
+
+        [Command("test")]
+        [Description("Commands on testing phase")]
+        public async Task Test(CommandContext ctx)
+        {
+            await ctx.TriggerTypingAsync();
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Title = "Not Implemented",
+                Description = ":x:",
+                ThumbnailUrl = ctx.Member.AvatarUrl
+
+            };
+            await ctx.RespondAsync(embed: embed);
         }
     }
 }
