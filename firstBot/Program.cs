@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace firstBot
 {
@@ -9,6 +11,21 @@ namespace firstBot
         {
             if (ConfigInitialization())
             {
+                string jsonData = File.ReadAllText("config.json");
+                var config = JsonSerializer.Deserialize<ConfigJson>(jsonData);
+                if (config.Token == "")
+                {
+                    Console.WriteLine("Error! empty token");
+                }
+                else if (config.Prefix == "")
+                {
+                    Console.WriteLine("Error! empty prefix");
+                }
+                else
+                {
+                    var bot = new Bot(config.Token, config.Prefix);
+                    bot.RunBot();
+                }
 
             }
             else
@@ -23,11 +40,12 @@ namespace firstBot
             }
             catch (FileNotFoundException _)
             {
-                string data = "{\n  \"token\": \"\",\n  \"prefix\": \"\"\n}";
-                using (var json = new StreamWriter("config.json"))
-                {
-                    json.Write(data);
-                }
+                string jsonString = JsonSerializer.Serialize(new ConfigJson(),
+                    new JsonSerializerOptions()
+                    {
+                        WriteIndented = true
+                    }) ;
+                File.WriteAllText("config.json", jsonString);
                 return false;
             }
             return true;
