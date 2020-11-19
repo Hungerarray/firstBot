@@ -12,10 +12,10 @@ namespace firstBot.Commands
     [Group("admin")]
     [Description("Administrative Commands")]
     //[Hidden]
-    [RequirePermissions(Permissions.ManageGuild)]
+    //[RequirePermissions(Permissions.ManageGuild)]
     class privateCommands 
     {
-        [Command("sudo"), Description("Executes a command as another user."), Hidden, RequireOwner]
+        [Command("sudo"), Description("Executes a command as another user."), RequireOwner]
         public async Task Sudo(CommandContext ctx,
             [Description("Member to execute as.")] DiscordMember discordMember,
             [RemainingText, Description("command text to execute")] string command)

@@ -77,6 +77,10 @@ namespace firstBot
                 e.Client.DebugLogger.LogMessage(LogLevel.Info, e.Client.CurrentApplication.Name, "Client is ready.", DateTime.Now);
             };
 
+            dsClient.ClientErrored += async (e) =>
+            {
+                e.Client.DebugLogger.LogMessage(LogLevel.Error, e.Client.CurrentApplication.Name, e.Exception.Message, DateTime.Now);
+            };
         }
 
         /// <summary>
