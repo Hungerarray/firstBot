@@ -11,7 +11,7 @@ namespace firstBot.Commands
 {
     [Group("admin")]
     [Description("Administrative Commands")]
-    //[Hidden]
+    [Hidden]
     //[RequirePermissions(Permissions.ManageGuild)]
     class privateCommands 
     {
