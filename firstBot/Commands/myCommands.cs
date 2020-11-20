@@ -44,31 +44,6 @@ namespace firstBot.Commands
                 await ctx.RespondAsync(rand.Next(min, max).ToString());
         }
 
-        [Command("test")]
-        [Description("Commands on testing phase")]
-        public async Task Test(CommandContext ctx)
-        {
-            await ctx.TriggerTypingAsync();
-
-            //var embed = new DiscordEmbedBuilder()
-            //{
-            //    Title = "Not Implemented",
-            //    Description = ":x:",
-            //    ThumbnailUrl = ctx.Member.AvatarUrl
-
-            //};
-            //await ctx.RespondAsync(embed: embed);
-
-            var msg = await ctx.RespondAsync("New messge");
-            await Task.Delay(5000);
-
-            await msg.ModifyAsync("modified", embed: new DiscordEmbedBuilder()
-            {
-                Title = "Edit",
-                ThumbnailUrl = ctx.User.AvatarUrl
-            });
-
-        }
 
         [Command("Poll")]
         [Description("Creates a poll with given emojis")]
@@ -102,6 +77,36 @@ namespace firstBot.Commands
             var results = poll_reactions.Reactions.Where(reac => emojis.Contains(reac.Key)).Select(reac => $"{reac.Key}: {reac.Value}");
 
             await ctx.RespondAsync(string.Join("\n", results));
+        }
+        
+        [Command("test")]
+        [Description("Commands on testing phase")]
+        public async Task Test(CommandContext ctx)
+        {
+            await ctx.TriggerTypingAsync();
+
+            //var embed = new DiscordEmbedBuilder()
+            //{
+            //    Title = "Not Implemented",
+            //    Description = ":x:",
+            //    ThumbnailUrl = ctx.Member.AvatarUrl
+
+            //};
+            //await ctx.RespondAsync(embed: embed);
+
+            var interactivity = ctx.Client.GetInteractivityModule();
+
+            var msg = await interactivity.WaitForMessageAsync((msg) =>
+            {
+                if (msg.Author.Id == ctx.User.Id)
+                    return true;
+                return false;
+            }, TimeSpan.FromSeconds(30));
+
+            if (msg == null)
+                await ctx.RespondAsync($"Got no message from, {ctx.User.Username}");
+            else
+                await ctx.RespondAsync(msg.Message.Content + ", from " + ctx.User.Username);
         }
 
         [Command("sendPaginated")]
