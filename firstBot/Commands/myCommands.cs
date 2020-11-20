@@ -50,14 +50,24 @@ namespace firstBot.Commands
         {
             await ctx.TriggerTypingAsync();
 
-            var embed = new DiscordEmbedBuilder()
-            {
-                Title = "Not Implemented",
-                Description = ":x:",
-                ThumbnailUrl = ctx.Member.AvatarUrl
+            //var embed = new DiscordEmbedBuilder()
+            //{
+            //    Title = "Not Implemented",
+            //    Description = ":x:",
+            //    ThumbnailUrl = ctx.Member.AvatarUrl
 
-            };
-            await ctx.RespondAsync(embed: embed);
+            //};
+            //await ctx.RespondAsync(embed: embed);
+
+            var msg = await ctx.RespondAsync("New messge");
+            await Task.Delay(5000);
+
+            await msg.ModifyAsync("modified", embed: new DiscordEmbedBuilder()
+            {
+                Title = "Edit",
+                ThumbnailUrl = ctx.User.AvatarUrl
+            });
+
         }
 
         [Command("Poll")]

@@ -4,7 +4,8 @@ using System.Text;
 
 namespace firstBot.Games
 {
-    class basegame
+    abstract class basegame
     {
+
     }
 }
