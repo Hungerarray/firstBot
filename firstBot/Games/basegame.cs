@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
@@ -10,9 +11,10 @@ namespace firstBot.Games
 {
     abstract class Basegame
     {
-        public uint MaxPlayers { get; private set; }
-        public List<DiscordUser> Players { get; set; }
-        public async Task<(DiscordMessage, bool)> UserInput(CommandContext ctx)
+        protected Basegame(uint maxPlayers) => MaxPlayers = maxPlayers;
+        protected uint MaxPlayers { get; private set; }
+        protected List<DiscordUser> Players { get; set; } = new List<DiscordUser>();
+        protected async Task<(DiscordMessage, bool)> UserInput(CommandContext ctx)
         {
             var interactivity = ctx.Client.GetInteractivityModule();
 
@@ -31,7 +33,55 @@ namespace firstBot.Games
             else
                 return (msg.Message, true);
         }
-        public abstract Task<bool> ValidInput();
+
+        protected async Task AddPlayers(CommandContext ctx, DiscordMessage msg)
+        {
+            msg = await msg.ModifyAsync("Adding players....");
+            Players.Add(ctx.User);
+            uint currPlayers = 1;
+
+            await AddMentionedPlayers(ctx.Message);
+            
+            while(currPlayers < MaxPlayers)
+            {
+                var interactivity = ctx.Client.GetInteractivityModule();
+                msg = await msg.ModifyAsync($"Not Enough players, {ctx.User.Mention} add more players by tagging them:");
+                var newMsg = await interactivity.WaitForMessageAsync(msg =>
+                {
+                    if (msg.Channel == ctx.Channel && msg.Author == ctx.User)
+                        return true;
+                    return false;
+                }, TimeSpan.FromMinutes(1));
+                await AddMentionedPlayers(newMsg?.Message);
+            }
+
+            async Task AddMentionedPlayers(DiscordMessage msg)
+            {
+                if (msg.MentionedUsers.Count != 0)
+                {
+                    while (currPlayers < MaxPlayers)
+                    {
+                        foreach (var usr in msg.MentionedUsers)
+                        {
+                            if (usr == null)
+                                break;
+
+                            Players.Add(usr);
+                            ++currPlayers;
+                            if (currPlayers == MaxPlayers)
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    await ctx.RespondAsync("Did not find any tagged members");
+                }
+            }
+
+            await msg.DeleteAsync();
+        }
+        protected abstract  Task<bool> ValidInput();
 
     }
 }

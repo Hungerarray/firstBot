@@ -9,6 +9,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Entities;
 using firstBot.Commands;
 
+
 namespace firstBot
 {
     class Bot
@@ -38,6 +39,7 @@ namespace firstBot
             dsClient.DebugLogger.LogMessage(LogLevel.Info, "setup", "Registering commands", DateTime.Now);
             commands.RegisterCommands<myCommands>();
             commands.RegisterCommands<privateCommands>();
+            commands.RegisterCommands<GamesCommands>();
         }
 
         /// <summary>

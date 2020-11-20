@@ -78,7 +78,7 @@ namespace firstBot.Commands
 
             await ctx.RespondAsync(string.Join("\n", results));
         }
-        
+
         [Command("test")]
         [Description("Commands on testing phase")]
         public async Task Test(CommandContext ctx)
@@ -98,7 +98,7 @@ namespace firstBot.Commands
 
             var msg = await interactivity.WaitForMessageAsync((msg) =>
             {
-                if (msg.Author.Id == ctx.User.Id)
+                if (msg.Channel == ctx.Channel && msg.Author == ctx.User)
                     return true;
                 return false;
             }, TimeSpan.FromSeconds(30));
@@ -106,7 +106,10 @@ namespace firstBot.Commands
             if (msg == null)
                 await ctx.RespondAsync($"Got no message from, {ctx.User.Username}");
             else
-                await ctx.RespondAsync(msg.Message.Content + ", from " + ctx.User.Username);
+            {
+                var users = msg.MentionedUsers.Select(usr => usr?.Username);
+                await ctx.RespondAsync(msg.Message.Content + ", from " + ctx.User.Username + "\n" + msg.MentionedUsers.Count + "\n" + string.Join<string>(" ",users));
+            }
         }
 
         [Command("sendPaginated")]
