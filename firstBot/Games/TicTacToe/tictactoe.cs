@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -11,34 +12,53 @@ using DSharpPlus.Interactivity;
 
 namespace firstBot.Games
 {
-    
+    public enum GameState
+    {
+        Won,
+        Tie
+    };
+
     class Tictactoe : Basegame
     {
         private const uint MaxNoOfPlayers = 2;
-        public Tictactoe(CommandContext ctx) : base(MaxNoOfPlayers)
+        private DiscordUser StartingPlayer;
+        public Tictactoe(CommandContext ctx) : base(MaxNoOfPlayers, ctx)
         {
-            ctx.Client.DebugLogger.LogMessage(LogLevel.Info, ctx.Client.CurrentApplication.Name, "Started game of TicTactoe", DateTime.Now);           
+            ctx.Client.DebugLogger.LogMessage(LogLevel.Info, ctx.Client.CurrentApplication.Name, "Started game of TicTactoe", DateTime.Now);
         }
 
-        private async Task GameSetup(CommandContext ctx)
+        /// <summary>
+        /// Initial Setup for game
+        /// </summary>
+        /// <returns></returns>
+        private async Task GameSetup()
         {
             var msg = await ctx.RespondAsync("Setting up game...");
-            await AddPlayers(ctx, msg);
-            var ready = await PlayersConfirm(ctx);
-            await PlayGames(ctx);
+            await AddPlayers(msg);
+            StartingPlayer = Players[new Random().Next(0, (int)MaxNoOfPlayers)];
         }
 
-        public async Task StartGame(CommandContext ctx)
+        /// <summary>
+        /// Starts the game
+        /// </summary>
+        /// <returns></returns>
+        public async Task StartGame()
         {
-            await GameSetup(ctx);
-            
-        }
-        protected override Task<bool> ValidInput()
-        {
-            throw new NotImplementedException();
+            await GameSetup();
+            if (!await PlayersConfirm())
+            {
+                await ctx.RespondAsync("One or more player didn't agree to play, ending the game");
+                return;
+            }
+
+            await PlayGame();
         }
 
-        private async Task<bool> PlayersConfirm(CommandContext ctx)
+        /// <summary>
+        /// Gets confirmation on players if they are willing to play the game.
+        /// </summary>
+        /// <returns>true if all players are ready and willing to play</returns>
+        private async Task<bool> PlayersConfirm()
         {
             await ctx.RespondAsync($"{Players.Select(player => player.Mention)} must reply with yes");
             var interactivity = ctx.Client.GetInteractivityModule();
@@ -67,6 +87,115 @@ namespace firstBot.Games
                     return true;
                 return false;
             }
+        }
+
+
+        /// <summary>
+        /// Playes the game
+        /// </summary>
+        /// <returns>Gamestate: wheather someone won or the game ended in tie
+        /// DiscordUser: the user who won or null if tie</returns>
+        private async Task<(GameState, DiscordUser)> PlayGame()
+        {
+            string title = string.Join(" vs ", Players.Select(player => player.Username));
+            GameState currState;
+            DiscordUser winner;
+
+            var board = GetNewBoard();
+            var msg = await Render(board, title, null);
+
+            // game loop
+            do
+            {
+                var currPlayer = GetPlayer();
+                var response = await GetPlayerResponse(currPlayer);
+                UpdateBoard(response, board);
+                await Render(board, title, msg);
+
+            } while (CheckWinnerOrTie(board,out currState, out winner));
+
+            return (GameState.Tie, null);
+        }
+
+        private byte[,] GetNewBoard()
+        {
+            return new byte[,]
+            {
+                { 1, 2, 3 },
+                { 4, 5, 6 },
+                { 7, 8, 9 }
+            };
+        }
+        
+        private async Task<DiscordMessage> Render(byte[,] board, string title, DiscordMessage prevMessage)
+        {
+            var desc = new StringBuilder();
+            string VerticalLine = "│";
+            string HorizontalLine = "━";
+
+            for (int i = 0; i < 3; ++i)
+            {
+                desc.AppendFormat("\t{1}{0}{2}{0}{3}",
+                    VerticalLine,
+                    GetItem(board[i, 0]),
+                    GetItem(board[i, 1]),
+                    GetItem(board[i, 2]));
+                desc.AppendLine();
+                if (i == 2)
+                    continue;
+                desc.AppendFormat("\t{0}{0}{0}{0}{0}",
+                    HorizontalLine);
+                desc.AppendLine();
+            }
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Title = title,
+                Description = desc.ToString(),
+                Color = DiscordColor.Blurple,
+            };
+
+            var _ = prevMessage?.DeleteAsync();
+            return await ctx.RespondAsync(embed: embed);
+        }
+
+        private string GetItem(byte value)
+        {
+            return value switch
+            {
+                1 => ":one:",
+                2 => ":two:",
+                3 => ":three:",
+                4 => ":four:",
+                5 => ":five:",
+                6 => ":six:",
+                7 => ":seven:",
+                8 => ":eight:",
+                9 => ":nine:",
+                11 => ":x:",
+                12 => ":o:",
+                _ => ":no_entry_sign: "
+            };
+        }
+
+        private DiscordUser GetPlayer()
+        {
+            
+        }
+
+        private Task<string> GetPlayerResponse(DiscordUser from)
+        {
+
+        }
+
+        private void UpdateBoard(string pos, byte[,] board)
+        {
+
+        }
+
+        private bool CheckWinnerOrTie(byte[,] board, out GameState curr, out DiscordUser winner)
+        {
+
         }
     }
 }

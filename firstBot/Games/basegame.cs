@@ -11,10 +11,11 @@ namespace firstBot.Games
 {
     abstract class Basegame
     {
-        protected Basegame(uint maxPlayers) => MaxPlayers = maxPlayers;
+        protected CommandContext ctx { get; private set; }
+        protected Basegame(uint maxPlayers, CommandContext ctx) => MaxPlayers = maxPlayers;
         protected uint MaxPlayers { get; private set; }
         protected List<DiscordUser> Players { get; set; } = new List<DiscordUser>();
-        protected async Task<(DiscordMessage, bool)> UserInput(CommandContext ctx)
+        protected async Task<(DiscordMessage, bool)> UserInput()
         {
             var interactivity = ctx.Client.GetInteractivityModule();
 
@@ -34,7 +35,7 @@ namespace firstBot.Games
                 return (msg.Message, true);
         }
 
-        protected async Task AddPlayers(CommandContext ctx, DiscordMessage msg)
+        protected async Task AddPlayers(DiscordMessage msg)
         {
             msg = await msg.ModifyAsync("Adding players....");
             Players.Add(ctx.User);
@@ -81,7 +82,6 @@ namespace firstBot.Games
 
             await msg.DeleteAsync();
         }
-        protected abstract  Task<bool> ValidInput();
 
     }
 }

@@ -17,7 +17,7 @@ namespace firstBot.Commands
         public async Task TicTacToe(CommandContext ctx)
         {
             var game = new Tictactoe(ctx);
-            await game.StartGame(ctx);
+            await game.StartGame();
         }
     }
 }

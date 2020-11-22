@@ -94,21 +94,71 @@ namespace firstBot.Commands
             //};
             //await ctx.RespondAsync(embed: embed);
 
-            var interactivity = ctx.Client.GetInteractivityModule();
-
-            var msg = await interactivity.WaitForMessageAsync((msg) =>
+            string title = string.Join(" vs ", new string[]{ "player1", "player2"});
+            var board = GetNewBoard();
+            // game loop
+            do
             {
-                if (msg.Channel == ctx.Channel && msg.Author == ctx.User)
-                    return true;
-                return false;
-            }, TimeSpan.FromSeconds(30));
+                await Render(board);
+            } while (false);
 
-            if (msg == null)
-                await ctx.RespondAsync($"Got no message from, {ctx.User.Username}");
-            else
+
+            byte[,] GetNewBoard()
             {
-                var users = msg.MentionedUsers.Select(usr => usr?.Username);
-                await ctx.RespondAsync(msg.Message.Content + ", from " + ctx.User.Username + "\n" + msg.MentionedUsers.Count + "\n" + string.Join<string>(" ",users));
+                return new byte[,]
+                {
+                { 1, 2, 3 },
+                { 4, 5, 6 },
+                { 7, 8, 9 }
+                };
+            }
+
+            async Task Render(byte[,] board)
+            {
+                var desc = new StringBuilder();
+                string VerticalLine = "│";
+                string HorizontalLine = "━";
+
+                for (int i = 0; i < 3; ++i)
+                {
+                    desc.AppendFormat("\t{1}{0}{2}{0}{3}",
+                        VerticalLine,
+                        GetItem(board[i, 0]),
+                        GetItem(board[i, 1]),
+                        GetItem(board[i, 2]));
+                    desc.AppendLine();
+                    if (i == 2)
+                        continue;
+                    desc.AppendFormat("\t{0}{0}{0}{0}{0}",
+                        HorizontalLine);
+                    desc.AppendLine();
+                }
+
+                var embed = new DiscordEmbedBuilder()
+                {
+                    Title = title,
+                    Description = desc.ToString(),
+                    Color = DiscordColor.Blurple,
+                };
+
+                await ctx.RespondAsync(embed: embed);
+            }
+
+            string GetItem(byte value)
+            {
+                return value switch
+                {
+                    1 => ":one:",
+                    2 => ":two:",
+                    3 => ":three:",
+                    4 => ":four:",
+                    5 => ":five:",
+                    6 => ":six:",
+                    7 => ":seven:",
+                    8 => ":eight:",
+                    9 => ":nine:",
+                    _ => ":no_entry_sign: "
+                };
             }
         }
 
