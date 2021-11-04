@@ -202,7 +202,7 @@ namespace firstBot.Games
                 var from = Players[currPlayerIndex];
                 int response = 0, loopCount = 0, MaxTrial = 10;
                 var interactivity = ctx.Client.GetInteractivityModule();
-                await ctx.RespondAsync($"{from.Mention} Your turn: ");
+                var del = await ctx.RespondAsync($"{from.Mention} Your turn: ");
                 do
                 {
                     ++loopCount;
@@ -235,6 +235,7 @@ namespace firstBot.Games
                     Default = true;
                 }
 
+                await del.DeleteAsync();
                 return response;
 
                 bool ValidPosition(int pos)
